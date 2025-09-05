@@ -1,0 +1,19 @@
+<div class="min-h-screen flex justify-content-center align-items-center" style="background-color: #002a8e;">
+   <ng-container *ngIf="loading">
+      <div>
+         <div class="loader-progress mx-auto">
+            <svg viewBox="0 0 100 100">
+               <circle class="base" cx="50" cy="50" r="40" />
+               <circle class="progress" cx="50" cy="50" r="40" />
+            </svg>
+            <img src="bcp/icon-dark.svg" alt="logo">
+         </div>
+         <div class="text-center my-2" style="color: #F5FEFF;">
+            Procesando tu solicitud...
+         </div>
+      </div>
+   </ng-container>
+   <ng-container *ngIf="!loading">
+      <img src="bcp/logo.svg" alt="" width="150">
+   </ng-container>
+</div>

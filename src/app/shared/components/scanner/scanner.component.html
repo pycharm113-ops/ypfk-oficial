@@ -1,0 +1,21 @@
+<div class="select-none scanner-container">
+   <div (click)="onCerrar()" class="pointer scanner-close border-circle flex justify-content-center align-items-center">
+      <i class="pi pi-times text-white"></i>
+   </div>
+   <zxing-scanner [device]="selectedDevice" [tryHarder]="true" (scanSuccess)="handleQrCodeResult($event)">
+   </zxing-scanner>
+
+   <div class="pointer border-round-md shadow-2 p-3 mb-5 absolute bottom-0 bg-white" (click)="fileInput.click()">
+      <div class="flex align-items-center px-5 gap-3">
+         <i class="pi pi-image text-yape"></i>
+         <span class="text-sm">Subir una imagen con QR</span>
+      </div>
+      <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" hidden />
+   </div>
+
+</div>
+
+<button class="floating-button" (click)="onVerTutorial()">
+   <span class="pulse-ring"></span>
+   <i class="pi pi-question-circle"></i>
+</button>

@@ -1,0 +1,277 @@
+<div *ngIf="!isFromAccount && !isCaptured" class="select-none min-h-screen" style="background-color: #002A8E;">
+   <div class="min-h-screen align-content-center bg-white border border-round-top-5xl">
+      <section class="text-center px-4">
+         <div class="my-3">
+            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+               <circle cx="12" cy="12" r="10" stroke="#F57C00" stroke-width="2" fill="none" />
+               <path d="M8 12.5L10.5 15L16 9" stroke="#F57C00" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" />
+            </svg>
+         </div>
+         <div class="font-semibold text-lg">{{ title }}</div>
+         <div class="bcp-primary text-5xl my-3">
+            {{ data.monto | currency: data.moneda: 'symbol-narrow' }}
+         </div>
+         <div class="bcp-text-gray">
+            {{ date.dia }} {{ date.fecha }} - {{ date.hora }}
+         </div>
+         <div class="py-4">
+            <ng-container *ngTemplateOutlet="sharedVoucher"></ng-container>
+         </div>
+      </section>
+
+      <section class="px-4">
+         <div *ngIf="!data.esServicio" class="flex justify-content-between border-bottom-1 border-gray-100 py-3">
+            <div>Enviado a</div>
+            <div class="text-right line-height-3" style="max-width: 200px;">
+               <div class="font-bold">{{ data.titular | titlecase }}</div>
+               <div class="bcp-text-gray">{{ number }}</div>
+               <div class="bcp-text-gray">
+                  <ng-container *ngIf="data.esTransferencia">
+                     {{ data.moneda === 'PEN' ? 'Moneda Soles' : 'Moneda Dolares' }}
+                  </ng-container>
+                  <ng-container *ngIf="!data.esTransferencia">
+                     {{ data.destino }}
+                  </ng-container>
+               </div>
+            </div>
+         </div>
+         <div *ngIf="data.esServicio" class="flex justify-content-between border-bottom-1 border-gray-100 py-3">
+            <div>Titular</div>
+            <div class="text-right line-height-3">
+               <div class="font-bold">{{ data.titular | titlecase }}</div>
+            </div>
+         </div>
+         <div *ngIf="data.esServicio" class="flex justify-content-between border-bottom-1 border-gray-100 py-3">
+            <div>Pagado a</div>
+            <div class="text-right line-height-3">
+               <div class="font-bold">{{ data.empresa }}</div>
+               <ng-container *ngIf="data.glosa">
+                  <div *ngIf="data.glosa.text1" class="bcp-text-gray">{{ data.glosa.text1 }}</div>
+                  <div *ngIf="data.glosa.text2" class="bcp-text-gray">{{ data.glosa.text2 }}</div>
+               </ng-container>
+            </div>
+         </div>
+         <div *ngIf="(!data.esTransferencia ||  data.comision > 0) && !data.esServicio"
+            class="flex justify-content-between border-bottom-1 border-gray-100 py-3">
+            <div>Comisión</div>
+            <div class="text-right line-height-3">
+               <div class="font-bold">
+                  {{ data.comision > 0 ? (data.comision | currency: data.moneda: 'symbol-narrow') : "Gratis" }}
+               </div>
+            </div>
+         </div>
+         <div *ngIf="data.comision > 0" class="flex justify-content-between border-bottom-1 border-gray-100 py-3">
+            <div>Total cobrado</div>
+            <div class="text-right line-height-3">
+               <div class="font-bold">
+                  {{ (data.monto + data.comision) | currency: data.moneda: 'symbol-narrow' }}
+               </div>
+            </div>
+         </div>
+         <div class="flex justify-content-between border-bottom-1 border-gray-100 py-3">
+            <div>Desde</div>
+            <div class="text-right line-height-3">
+               <div class="truncate-text font-bold" style="max-width: 200px;">{{ account.nombre }}</div>
+               <div class="bcp-text-gray">{{ '**** ' + account.nrocuenta.slice(-4) }}</div>
+            </div>
+         </div>
+         <div class="flex justify-content-between border-bottom-1 border-gray-100 py-3">
+            <div>Número de operación</div>
+            <div class="text-right line-height-3">
+               <div class="font-bold">{{ data.operacion }}</div>
+            </div>
+         </div>
+      </section>
+
+      <section class="px-4 pt-2" [ngClass]="data.esTransferencia ? 'my-4' : 'my-3'">
+         <img *ngIf="data.esTransferencia" src="bcp/banner.webp" alt="banner" class="w-full">
+      </section>
+
+      <section class="text-center">
+         <button (click)="onCerrar()" class="bcp-button" type="button">{{ label }}</button>
+      </section>
+
+      <section class="text-center my-5" [ngClass]="data.esYape ? 'py-2' : 'py-4'">
+         <div (click)="onVolverInicio()" class="pointer bcp-success font-bold">
+            Ir a Inicio
+         </div>
+      </section>
+
+   </div>
+</div>
+
+<div *ngIf="isFromAccount || isCaptured" class="select-none min-h-screen bg-white">
+   <div class="flex justify-content-between align-items-center p-4 border-bottom-2 border-gray-100">
+      <div class="font-semibold p-1">
+         <a (click)="onCerrar()">
+            <i class="pi pi-arrow-left text-xs font-semibold mr-2"></i>
+         </a>
+         <span>Detalle de Movimiento</span>
+      </div>
+      <a (click)="onCerrar()" class="pointer p-1">
+         <i class="pi pi-times"></i>
+      </a>
+   </div>
+   <div #captureRef [ngClass]="isCaptured ? 'pt-5': 'pt-0'">
+      <div class="text-center pt-3 px-4">
+         <div *ngIf="isCaptured" class="text-left" [style.opacity]="!isCaptured ? '0' : '1'">
+            <img src="bcp/logo-ligth.svg" alt="logo">
+         </div>
+         <div *ngIf="!isCaptured" class="font-semibold text-lg my-3">
+            <ng-container *ngIf="data.esTransferencia">
+               Transferencia a terceros BCP
+            </ng-container>
+            <ng-container *ngIf="data.esYape">
+               Yapear a Cecular
+            </ng-container>
+            <ng-container *ngIf="data.esServicio">
+               {{ data.nameMask }}
+            </ng-container>
+         </div>
+
+         <div *ngIf="isCaptured" class="font-semibold text-lg my-3">
+            {{ title }}
+         </div>
+
+         <div *ngIf="!isCaptured" class="mb-3">
+            <span class="bcp-primary p-1" style="background-color: #EBF4FF;">Monto enviado</span>
+         </div>
+
+         <div class="bcp-primary text-5xl mb-3">
+            {{ data.monto | currency: data.moneda: 'symbol-narrow' }}
+         </div>
+
+         <div *ngIf="!isCaptured" class="bcp-gray mb-3">
+            {{ date.dia }}, {{ date.fecha }}
+         </div>
+
+         <div *ngIf="isCaptured" class="bcp-text-gray">
+            {{ date.dia }} {{ date.fecha }} - {{ date.hora }}
+         </div>
+
+         <ng-container *ngIf="!isCaptured">
+            <div class="py-4">
+               <ng-container *ngTemplateOutlet="sharedVoucher"></ng-container>
+            </div>
+         </ng-container>
+
+         <ng-container *ngIf="!isCaptured">
+            <ng-container *ngIf="data.esTransferencia">
+               <div class="flex justify-content-between border-bottom-2 border-gray-100 py-3">
+                  <div>Canal</div>
+                  <div class="text-right line-height-3">
+                     <div class="font-semibold">Banca Móvil BCP</div>
+                  </div>
+               </div>
+            </ng-container>
+            <div class="flex justify-content-between border-bottom-2 border-gray-100 py-3">
+               <div>Número de operación</div>
+               <div class="text-right line-height-3">
+                  <div class="font-semibold">{{ data.operacion }}</div>
+               </div>
+            </div>
+         </ng-container>
+
+         <ng-container *ngIf="isCaptured">
+            <section class="mt-3">
+               <div *ngIf="!data.esServicio" class="flex justify-content-between border-bottom-2 border-gray-100 py-3">
+                  <div>Enviado a</div>
+                  <div class="text-right line-height-3" style="max-width: 200px;">
+                     <div class="font-bold">{{ data.titular | titlecase }}</div>
+                     <div class="bcp-text-gray">{{ number }}</div>
+                     <div class="bcp-text-gray">
+                        <ng-container *ngIf="data.esTransferencia">
+                           {{ data.moneda === 'PEN' ? 'Moneda Soles' : 'Moneda Dolares' }}
+                        </ng-container>
+                        <ng-container *ngIf="!data.esTransferencia">
+                           {{ data.destino }}
+                        </ng-container>
+                     </div>
+                  </div>
+               </div>
+               <div *ngIf="data.esServicio" class="flex justify-content-between border-bottom-2 border-gray-100 py-3">
+                  <div>Titular</div>
+                  <div class="text-right line-height-3">
+                     <div class="font-bold">{{ data.titular | titlecase }}</div>
+                  </div>
+               </div>
+               <div *ngIf="data.esServicio" class="flex justify-content-between border-bottom-2 border-gray-100 py-3">
+                  <div>Pagado a</div>
+                  <div class="text-right line-height-3">
+                     <div class="font-bold">{{ data.empresa }}</div>
+                     <ng-container *ngIf="data.glosa">
+                        <div *ngIf="data.glosa.text1" class="bcp-text-gray">{{ data.glosa.text1 }}</div>
+                        <div *ngIf="data.glosa.text2" class="bcp-text-gray">{{ data.glosa.text2 }}</div>
+                     </ng-container>
+                  </div>
+               </div>
+               <div *ngIf="(!data.esTransferencia ||  data.comision > 0) && !data.esServicio"
+                  class="flex justify-content-between border-bottom-2 border-gray-100 py-3">
+                  <div>Comisión</div>
+                  <div class="text-right line-height-3">
+                     <div class="font-bold">
+                        {{ data.comision > 0 ? (data.comision | currency: data.moneda: 'symbol-narrow') : "Gratis" }}
+                     </div>
+                  </div>
+               </div>
+               <div *ngIf="data.comision > 0" class="flex justify-content-between border-bottom-2 border-gray-100 py-3">
+                  <div>Total cobrado</div>
+                  <div class="text-right line-height-3">
+                     <div class="font-bold">
+                        {{ (data.monto + data.comision) | currency: data.moneda: 'symbol-narrow' }}
+                     </div>
+                  </div>
+               </div>
+               <div class="flex justify-content-between border-bottom-2 border-gray-100 py-3">
+                  <div>Desde</div>
+                  <div class="text-right line-height-3">
+                     <div class="truncate-text font-bold" style="max-width: 200px;">{{ account.nombre }}</div>
+                     <div class="bcp-text-gray">{{ '**** ' + account.nrocuenta.slice(-4) }}</div>
+                  </div>
+               </div>
+               <div class="flex justify-content-between border-bottom-2 border-gray-100 py-3">
+                  <div>Número de operación</div>
+                  <div class="text-right line-height-3">
+                     <div class="font-bold">{{ data.operacion }}</div>
+                  </div>
+               </div>
+            </section>
+
+         </ng-container>
+      </div>
+
+      <ng-container *ngIf="isCaptured">
+         <div class="wave-container mt-5 pt-3">
+            <div class="diglett-circles">
+               <div *ngFor="let c of circles; let i = index" class="diglett"></div>
+            </div>
+         </div>
+         <div class="wave-bottom"></div>
+      </ng-container>
+
+      <div *ngIf="!isCaptured" class="px-5">
+         <div class="flex align-items-center border-round gap-3 p-3 my-4"
+            style="background-color: #ECF4FF; color: #676F7C;">
+            <i class="pi pi-info-circle text-xl font-bold" style="color: #4074AF;"></i>
+            <span class="text-left line-height-3" style="font-size: 13px;">
+               Para ver mas detalles de esta operacion ingresa desde la opcion Ver mas en el listado de movimientos.
+            </span>
+         </div>
+      </div>
+   </div>
+</div>
+
+
+<ng-template #sharedVoucher>
+   <div class="bcp-success font-bold flex align-items-center justify-content-center gap-5">
+      <div (click)="onDescargar()" class="pointer flex align-items-center gap-2 mr-3">
+         <img src="bcp/icons/download.svg" style="vertical-align: middle;" width="18">
+         <div class="align-content-center" style="margin-top: 2px;">Descargar</div>
+      </div>
+      <div (click)="onCompartir()" class="pointer flex align-items-center gap-2 ml-3">
+         <img src="bcp/icons/shared.svg" style="vertical-align: middle;" width="18">
+         <div class="align-content-center" style="margin-top: 2px;">Compartir</div>
+      </div>
+   </div>
+</ng-template>

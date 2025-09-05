@@ -1,0 +1,24 @@
+<div class="text-center pt-4">
+   <i class="text-purple-900 pi pi-exclamation-triangle text-warning text-4xl mb-3"></i>
+   <div class="text-lg font-semibold mb-2">
+      Navegador Incompatible
+   </div>
+
+   <div class="mb-3">
+      <div class="text-sm text-gray-600 mb-3">
+         Estás viendo esta aplicación desde un navegador no compatible.
+         <br><br>
+         Te recomendamos copiar el siguiente enlace y abrirlo en otro navegador para completar
+         la instalación.
+      </div>
+      <img src="auth/navegador.webp" width="150" class="mb-3">
+      <p-inputGroup>
+         <input [value]="currentUrl" pInputText type="text" class="w-full text-xs bg-gray-100 " [readonly]="true" />
+         <button (click)="copiarEnlace()" type="button" pButton icon="pi pi-copy" class="p-button-secondary">
+         </button>
+      </p-inputGroup>
+      <br>
+      <app-resellers></app-resellers>
+   </div>
+
+</div>

@@ -1,0 +1,423 @@
+<div class="text-secondary bg-white min-h-screen select-none">
+   <div class="flex flex-column min-h-screen justify-content-between">
+
+      <div class="p-dialog-header" style="background-color: #742284; padding: 0.75rem 0.5rem;">
+         <div class="flex align-items-center gap-2">
+            <div routerLink="/home" type="button" class="p-dialog-button">
+               <i class="pi pi-chevron-left"></i>
+            </div>
+            <span class="text-white font-bold">Mi Perfil</span>
+         </div>
+      </div>
+
+      <div class="flex-1 px-4 pt-4">
+         <div class="font-semibold mb-4">
+            <div class="font-bold mb-1">Mi cuenta</div>
+            <div class="border-bottom-1 border-gray-200">
+               <a (click)="viewAccount = true" class="tourid-1 px-1 py-options">
+                  <i class="text-yape pi pi-id-card"></i>
+                  <span class="text-sm">Mis Datos</span>
+               </a>
+            </div>
+            <div class="border-bottom-1 border-gray-200">
+               <a (click)="viewContacts = true" class="tourid-2 px-1 py-options">
+                  <i class="text-yape pi pi-address-book"></i>
+                  <span class="text-sm">Mis Contactos</span>
+               </a>
+            </div>
+            <div *ngIf="token.bcp" class="border-bottom-1 border-gray-200">
+               <a (click)="onAccederBCP()" class="px-1 py-options">
+                  <i class="text-yape pi pi-credit-card"></i>
+                  <span class="text-sm">Mi BCP</span>
+               </a>
+            </div>
+            <div *ngIf="token.ibk" class="border-bottom-1 border-gray-200">
+               <a (click)="onAccederIBK()" class="px-1 py-options">
+                  <i class="text-yape pi pi-credit-card"></i>
+                  <span class="text-sm">Mi Interbank</span>
+               </a>
+            </div>
+         </div>
+         <div class="font-semibold mb-4">
+            <div class="font-bold mb-1">Opciones</div>
+            <div class="border-bottom-1 border-gray-200">
+               <a (click)="onRealizarRecargas()" class="px-1 py-options">
+                  <i class="text-yape pi pi-mobile"></i>
+                  <span class="text-sm">Recargas</span>
+               </a>
+            </div>
+            <div class="border-bottom-1 border-gray-200">
+               <a (click)="viewSettings = true" class="tourid-3 px-1 py-options">
+                  <i class="text-yape pi pi-cog"></i>
+                  <span class="text-sm">Configuraciones</span>
+               </a>
+            </div>
+            <div class="border-bottom-1 border-gray-200">
+               <a (click)="onVaciarMovimientos()" class="tourid-4 px-1 py-options">
+                  <i class="text-yape pi pi-trash"></i>
+                  <span class="text-sm">Vaciar Movimientos</span>
+               </a>
+            </div>
+         </div>
+         <div class="font-semibold">
+            <div class="font-bold mb-1">Información</div>
+            <div *ngIf="(!token.payment || !token.bcp)" (click)="onYapePlanes()"
+               class="border-bottom-1 border-gray-200">
+               <a class="px-1 py-options">
+                  <i class="text-yape pi pi-shopping-cart"></i>
+                  <span class="text-sm">Productos</span>
+                  <p-badge *ngIf="!token.payment" value="¡Compra aquí!" severity="warn"
+                     styleClass="py-1 px-2 p-badge-xs" />
+               </a>
+            </div>
+            <div class="border-bottom-1 border-gray-200">
+               <a (click)="onServiciosDoxing()" class="px-1 py-options">
+                  <i class="text-yape pi pi-sparkles"></i>
+                  <span class="text-sm">Doxeos</span>
+               </a>
+            </div>
+
+            <div *ngIf="false" class="border-bottom-1 border-gray-200">
+               <a (click)="onServiciosQuestion()" class="px-1 py-options">
+                  <i class="text-yape pi pi-question-circle"></i>
+                  <span class="text-sm">Preguntas</span>
+               </a>
+            </div>
+
+            <div class="border-bottom-1 border-gray-200">
+               <a (click)="onStartTour()" class="px-1 py-options">
+                  <i class="text-yape pi pi-question-circle"></i>
+                  <span class="text-sm">Tutorial</span>
+               </a>
+            </div>
+            <div class="border-bottom-1 border-gray-200">
+               <a [href]="linkSoporte" target="_blank" class="px-1 py-options">
+                  <i class="text-yape pi pi-whatsapp"></i>
+                  <span class="text-sm">Soporte</span>
+               </a>
+            </div>
+
+            <div class="border-bottom-1 border-gray-200">
+               <a (click)="onCerrarSesion()" class="px-1 py-options">
+                  <i class="text-yape pi pi-sign-out"></i>
+                  <span class="text-sm">Cerrar Sesión</span>
+               </a>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<p-dialog [(visible)]="modalDoxing" [modal]="true" [maximizable]="true" [showHeader]="false" [dismissableMask]="true"
+   styleClass="p-dialog-padding-0 mx-2">
+   <app-doxing></app-doxing>
+</p-dialog>
+
+<ng-container *ngIf="modalQuestion">
+   <p-dialog [(visible)]="modalQuestion" [modal]="true" [focusOnShow]="false" styleClass="p-dialog-menu">
+      <ng-template pTemplate="header">
+         <ng-container *ngTemplateOutlet="dialogHeader; context: { title: 'Tutoriales' }"></ng-container>
+      </ng-template>
+      <app-question></app-question>
+   </p-dialog>
+</ng-container>
+
+<ng-container *ngIf="viewAccount">
+   <p-dialog [(visible)]="viewAccount" [modal]="true" [focusOnShow]="false" styleClass="p-dialog-menu">
+      <ng-template pTemplate="header">
+         <ng-container *ngTemplateOutlet="dialogHeader; context: { title: 'Mis Datos' }"></ng-container>
+      </ng-template>
+      <ng-container *ngTemplateOutlet="templateAccount"></ng-container>
+   </p-dialog>
+</ng-container>
+
+<ng-container *ngIf="viewContacts">
+   <p-dialog [(visible)]="viewContacts" [modal]="true" [focusOnShow]="false" styleClass="p-dialog-menu">
+      <ng-template pTemplate="header">
+         <ng-container *ngTemplateOutlet="dialogHeader; context: { title: 'Mis Contactos' }"></ng-container>
+      </ng-template>
+      <ng-container *ngTemplateOutlet="templateContacts"></ng-container>
+   </p-dialog>
+</ng-container>
+
+<ng-container *ngIf="viewSettings">
+   <p-dialog [(visible)]="viewSettings" [modal]="true" [focusOnShow]="false" styleClass="p-dialog-menu">
+      <ng-template pTemplate="header">
+         <ng-container *ngTemplateOutlet="dialogHeader; context: { title: 'Configuraciones' }"></ng-container>
+      </ng-template>
+      <ng-container *ngTemplateOutlet="templateSettings"></ng-container>
+   </p-dialog>
+</ng-container>
+
+<ng-container *ngIf="viewYapePlanes">
+   <p-dialog [(visible)]="viewYapePlanes" [modal]="true" [focusOnShow]="false" styleClass="p-dialog-menu">
+      <ng-template pTemplate="header">
+         <ng-container *ngTemplateOutlet="dialogHeader; context: { title: 'PRODUCTOS' }"></ng-container>
+      </ng-template>
+      <app-paquetes></app-paquetes>
+   </p-dialog>
+</ng-container>
+
+<ng-template #templateAccount>
+   <form [formGroup]="Form" autocomplete="off" class="mt-5">
+
+      <div class="mb-3">
+         <p-floatLabel variant="on" class="mt-3">
+            <input pInputText id="titular" formControlName="titular" autocomplete="off" maxlength="100"
+               class="w-full" />
+            <label for="titular">Titular</label>
+         </p-floatLabel>
+      </div>
+
+      <div class="tourid-2 mb-3">
+         <p-floatLabel variant="on" class="mb-2">
+            <input pInputText id="saldo" formControlName="saldo" pKeyFilter="money" autocomplete="off" maxlength="15"
+               class="w-full" />
+            <label for="saldo">Saldo</label>
+         </p-floatLabel>
+      </div>
+
+      <ng-container *ngIf="token && token.pin">
+         <div class="tourid-3 border-top-1 border-gray-200 pt-3">
+
+            <ng-container *ngIf="token.client">
+               <input [value]="email" pInputText type="text" placeholder="Correo" class="w-full mb-2" disabled />
+               <ng-container *ngTemplateOutlet="pinInput"></ng-container>
+            </ng-container>
+
+            <ng-container *ngIf="!token.client">
+               <ng-container *ngTemplateOutlet="pinInput"></ng-container>
+               <small *ngIf="!isValid" class="text-red-500">
+                  Máximo 6 caracteres permitidos.
+               </small>
+            </ng-container>
+
+            <ng-template #pinInput>
+               <p-inputGroup>
+                  <input [formControl]="pin" pInputText type="text" maxlength="6" placeholder="PIN" class="w-full"
+                     pKeyFilter="pint" #inputRef1 [readonly]="inputRef1.disabled" />
+                  <ng-container *ngIf="token.payment">
+                     <button (click)="inputRef1.disabled = !inputRef1.disabled" type="button" pButton
+                        icon="pi pi-pencil" class="p-button-warn"></button>
+                     <button (click)="onGuardarPin()" type="button" pButton icon="pi pi-save" class="p-button-success"
+                        [disabled]="inputRef1.disabled || (token.pin === pin.value) || !isValid">
+                     </button>
+                  </ng-container>
+               </p-inputGroup>
+            </ng-template>
+         </div>
+
+         <div *ngIf="token.payment" class="mt-2">
+            <p-message size="small" severity="success" icon="pi pi-check-circle">
+               <small>
+                  El PIN es de acceso único. Por seguridad, evita compartirlo porque otra persona podría
+                  modificarlo.
+               </small>
+            </p-message>
+         </div>
+
+         <div *ngIf="autocomplete" class="mt-2">
+            <p-message size="small" [severity]="isAutocompleteActive ? 'success' : 'error'"
+               [icon]="isAutocompleteActive ? 'pi pi-check-circle' : 'pi pi-times-circle'">
+               <small *ngIf="isAutocompleteActive">
+                  El autocompletado está activo hasta {{ autoExpired | date: 'dd/MM/yyyy' }}.
+               </small>
+               <small *ngIf="!isAutocompleteActive">
+                  El autocompletado está inactivo o ha expirado.
+               </small>
+            </p-message>
+         </div>
+
+         <div *ngIf="!token.payment">
+            <p-message size="small" icon="pi pi-exclamation-triangle" severity="warn" styleClass="my-2">
+               <small>
+                  Actualmente estas como Usuario Free, una vez realices el pago tendras acceso
+                  permanente<ng-container *ngIf="userfreeClient"> y se quitarán las marcas de
+                     agua</ng-container>.<br>
+                  <ng-container *ngIf="!token.client">
+                     <strong>Tiempo de prueba restante:</strong> {{ formattedTime }}
+                  </ng-container>
+               </small>
+            </p-message>
+         </div>
+
+         <div *ngIf="token.payment && !token.client" class="my-3">
+            <small class="text-red-500">
+               Sin correo no será posible recuperar el PIN. Si lo olvidas o lo pierdes, no podré garantizar tu acceso.
+               Asegúrate de vincular con un correo válido.
+            </small>
+            <button (click)="onVincularEmail()" pButton label="Vincular Correo" icon="pi pi-envelope"
+               class="w-full mt-3">
+            </button>
+         </div>
+      </ng-container>
+   </form>
+</ng-template>
+
+<ng-template #templateContacts>
+   <form [formGroup]="FormTitulares" autocomplete="off" class="mt-5">
+      <div class="tourid-4 mb-4">
+         <div class="flex gap-2 mb-3">
+            <div class="w-full">
+               <p-floatLabel variant="on" styleClass="w-full">
+                  <input pInputText id="titular" formControlName="titular" class="w-full" />
+                  <label for="titular">Titular</label>
+               </p-floatLabel>
+            </div>
+            <div>
+               <button (click)="fileInput.click()" pButton icon="pi pi-camera" class="p-button-secondary w-full h-full"
+                  size="small">
+               </button>
+               <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" hidden />
+            </div>
+         </div>
+
+         <p-floatLabel variant="on" class="mb-3">
+            <input pInputText id="celular" formControlName="celular" maxlength="9" pKeyFilter="pint" copyPaste
+               class="w-full" />
+            <label for="celular">Celular</label>
+         </p-floatLabel>
+
+         <div class="mb-3 flex gap-2">
+            <button (click)="agregarTitular()" pButton label="Guardar" icon="pi pi-save" size="small" class="w-full">
+            </button>
+            <button *ngIf="false" (click)="onVerTutorial()" pButton icon="pi pi-info-circle" class="p-button-info"
+               size="small">
+            </button>
+         </div>
+      </div>
+
+      <div class="mb-2">
+         <p-message size="small" icon="pi pi-info-circle" styleClass="bg-yape-message">
+            Los números que registres formarán parte del autocompletado.
+         </p-message>
+      </div>
+
+      <ng-container *ngIf="titulares.length > 0">
+         <div>
+            <p-table [value]="titulares" [size]="'small'" scrollHeight="305px">
+               <ng-template #header>
+                  <tr class="text-sm">
+                     <th class="text-center">Titular</th>
+                     <th class="text-center">Celular</th>
+                     <th style="width: 50px;"></th>
+                  </tr>
+               </ng-template>
+               <ng-template #body let-item let-rowIndex="rowIndex">
+                  <tr class="text-sm">
+                     <td class="text-center">
+                        {{ item.titular }}
+                     </td>
+                     <td class="text-center pointer" (click)="onCopyPaste(item.celular)">
+                        {{ item.celular }}
+                     </td>
+                     <td>
+                        <button (click)="onEliminar(rowIndex)" pButton icon="pi pi-trash"
+                           class="p-button-danger p-button-outlined" size="small">
+                        </button>
+                     </td>
+                  </tr>
+               </ng-template>
+            </p-table>
+         </div>
+      </ng-container>
+      <ng-container *ngIf="titulares.length === 0">
+         <div class="text-center mt-5">
+            <div class="pt-5 mb-2 text-secondary2"><i class="pi pi-users text-6xl"></i></div>
+            <div class="text-sm text-secondary2">
+               No tienes números registrados.
+            </div>
+         </div>
+      </ng-container>
+   </form>
+</ng-template>
+
+<ng-template #templateSettings>
+   <div [formGroup]="FormSettings" class="mt-4">
+      <p-fieldset legend="Generales">
+         <div class="flex align-items-center gap-2 text-sm mb-1">
+            <p-checkbox formControlName="autoPayment" [binary]="true" inputId="form1" />
+            <label for="form1">Recibir un Pago</label>
+            <small *ngIf="autoPayment" class="text-red-500">(Autoyape)</small>
+         </div>
+         <div class="flex align-items-center gap-2 text-sm mb-1">
+            <p-checkbox formControlName="allowMore500" [binary]="true" inputId="form2" />
+            <label for="form2">Permitir yapear más de 500</label>
+         </div>
+         <div class="flex align-items-center gap-2 text-sm mb-1">
+            <p-checkbox formControlName="allowChangeDate" [binary]="true" inputId="form3"
+               (onChange)="onChangeAllowChangeDate()" />
+            <label for="form3">Permitir ingresar otra fecha</label>
+         </div>
+         <div class="flex align-items-center gap-2 text-sm mb-1">
+            <p-checkbox formControlName="allowSwipe" [binary]="true" inputId="form4" />
+            <label for="form4">Borrar movimientos con el dedo</label>
+         </div>
+         <div class="flex align-items-center gap-2 text-sm mb-1">
+            <p-checkbox formControlName="showTitularsReal" [binary]="true" inputId="form5" />
+            <label for="form5">Mostrar contactos registrados</label>
+         </div>
+         <div class="flex align-items-center gap-2 text-sm mb-1">
+            <p-checkbox formControlName="showTitularsFake" [binary]="true" inputId="form6" />
+            <label for="form6">Mostrar contactos falsos</label>
+         </div>
+      </p-fieldset>
+      <br>
+      <p-fieldset legend="Diseño">
+         <div class="flex align-items-center gap-2 text-sm mb-1">
+            <p-checkbox formControlName="showSearch" [binary]="true" inputId="form7" />
+            <label for="form7">Mostrar buscador del inicio</label>
+         </div>
+         <div class="flex align-items-center gap-2 text-sm mb-1">
+            <p-checkbox formControlName="showConfetti" [binary]="true" inputId="form8" />
+            <label for="form8">Mostrar Confetti</label>
+            <div class="flex gap-2 ml-auto">
+               <div class="flex gap-2 justify-content-end">
+                  <div class="flex align-items-center">
+                     <p-radiobutton [value]="1" formControlName="confetti" inputId="confetti1" size="small" />
+                     <label for="confetti1" class="ml-2">1</label>
+                  </div>
+                  <div class="flex align-items-center">
+                     <p-radiobutton [value]="2" formControlName="confetti" inputId="confetti2" size="small" />
+                     <label for="confetti2" class="ml-2">2</label>
+                  </div>
+                  <div *ngIf="false" class="flex align-items-center">
+                     <p-radiobutton [value]="3" formControlName="confetti" inputId="confetti3" size="small" />
+                     <label for="confetti3" class="ml-2">3</label>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="flex align-items-center gap-2 text-sm mb-1">
+            <p-checkbox formControlName="showBanner" [binary]="true" inputId="form9" />
+            <label for="form9">Mostrar Anuncio</label>
+         </div>
+         <div class="flex align-items-center gap-2 mb-2 mt-4">
+            <p-floatlabel class="w-full" variant="on">
+               <p-select (onChange)="onChangeBanner()" [options]="arrayBanners" formControlName="banner"
+                  optionLabel="title" optionValue="id" class="w-full" size="small" inputId="on_label" appendTo="body" />
+               <label for="on_label">Imagen</label>
+            </p-floatlabel>
+         </div>
+         <div class="border-round-xl border-primary border-1">
+            <img [src]="imageUrl" alt="banner" width="100%" class="border-round-xl" style="display: block;">
+         </div>
+         <div *ngIf="false" class="text-gray-400">
+            <small>
+               Si tienes alguna otra publicidad y quieres que lo agregue, enviame una captura al whatsapp.
+            </small>
+         </div>
+      </p-fieldset>
+   </div>
+</ng-template>
+
+<ng-template #dialogHeader let-title="title">
+   <div class="flex align-items-center gap-2">
+      <div (click)="closeAllDialogs()" type="button" class="p-dialog-button">
+         <i class="pi pi-chevron-left"></i>
+      </div>
+      <span class="text-white font-bold">{{ title }}</span>
+   </div>
+</ng-template>
+
+<app-confetti></app-confetti>

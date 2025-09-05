@@ -1,0 +1,242 @@
+<div *ngIf="!showCaptura" class="select-none bg-white min-h-screen flex flex-column justify-content-between">
+   <div style="background-color: #732283; !important">
+      <div class="flex justify-content-between align-items-center px-5 py-4 border border-round-top-2xl"
+         style="background-color: white;">
+         <div class="flex">
+            <div (click)="onCerrar()" class="pointer">
+               <i class="text-secondary2 text-xl pi pi-angle-left mr-5"></i>
+            </div>
+            <span class="text-secondary3 font-semibold">
+               {{ isRecharge ? 'Recargar a' : 'Yapear a'}}
+            </span>
+         </div>
+         <div (click)="onCerrar()" class="pointer">
+            <i class="text-secondary2 pi pi-times"></i>
+         </div>
+      </div>
+   </div>
+
+   <ng-container *ngIf="!isRecharge">
+      <ng-container *ngIf="!showOtrosBancos">
+         <div class="py-3 text-center tourid-12" style="height: 75px;">
+            <p-skeleton *ngIf="loadTitular" width="10rem" styleClass="mx-auto" />
+            <textarea *ngIf="!loadTitular" [ngModel]="titular | telf" (ngModelChange)="titular = $event"
+               class="font-semibold text-center titular-payment" rows="1" (input)="autoGrow($event)"></textarea>
+            <div *ngIf="!loadTitular && celular" class="text-500 text-xs">
+               *** *** <input type="tel" inputmode="numeric" [(ngModel)]="lastDigits" maxlength="3" onlyNumbers
+                  class="number-payment">
+            </div>
+         </div>
+
+         <div class="flex-1 align-content-center">
+            <div class="align-content-center text-center">
+               <div class="flex justify-content-center align-items-start mb-3 tourid-13">
+                  <div style="color: #E3B2EC;" class="text-lg font-bold mb-2 mr-1 align-self-end">S/</div>
+                  <p-inputNumber inputId="montoInput" [formControl]="amount" mode="decimal" [minFractionDigits]="0"
+                     [maxFractionDigits]="2" [format]="false" [locale]="decimalLocale" inputMode="decimal">
+                  </p-inputNumber>
+
+               </div>
+               <div class="border-round-2xl bg-gray-100 w-19rem px-2 py-1 mx-auto">
+                  <small class="text-xs font-normal text-500" [ngClass]="{'text-red-500': dangerText}">
+                     Límite por yapeo S/ 500, límite total por día S/ 2000
+                  </small>
+               </div>
+            </div>
+         </div>
+
+         <div class="text-center p-5">
+            <textarea
+               class="text-center border-none outline-none text-sm font-medium text-500 border-bottom-2 border-secondary pb-3 w-full"
+               [class.border-purple]="isFocused" [(ngModel)]="mensaje" placeholder="Agregar Mensaje"
+               style="font-family: Roboto;" (focus)="isFocused = true" (blur)="isFocused = false">
+            </textarea>
+         </div>
+
+         <div class="bg-white w-full p-3 my-5">
+            <div class="flex gap-2">
+               <button (click)="onOtrosBancos()" pButton size="small" [disabled]="disabledButton"
+                  class="w-full py-3 p-button-outlined p-button-secondary tourid-14" label="OTROS BANCOS">
+               </button>
+               <button (click)="onPreYapear()" pButton size="small" class="w-full py-3 tourid-15" label="YAPEAR"
+                  [ngClass]="{ 'p-button-secondary surface-300': disabledButton }" [disabled]="disabledButton">
+               </button>
+            </div>
+         </div>
+      </ng-container>
+
+      <ng-container *ngIf="showOtrosBancos">
+         <div class="flex-1 mt-3">
+            <div class="px-4">
+               <div (click)="onPagarOtroBancos('Yape')" class="pointer border-round-md shadow-2 p-3 mb-2">
+                  <div class="font-medium flex align-items-center gap-3">
+                     <img src="icons/icon-96x96.png" width="30px" class="border-circle">
+                     <span class="font-bold text-sm" style="color: #2D233C;">Yape</span>
+                  </div>
+               </div>
+            </div>
+            <div class="text-yape my-4 px-4">
+               <div class="text-sm font-bold">Selecciona una entidad financiera</div>
+            </div>
+            <div class="py-1 px-4" style="max-height: 464px; overflow-y: auto;">
+               <ng-container *ngFor="let item of destinos">
+                  <div (click)="onPagarOtroBancos(item)" class="pointer border-round-md shadow-2 p-3 mb-3">
+                     <div class="font-medium flex align-items-center gap-3">
+                        <div class="text-center border-circle flex justify-content-center align-items-center"
+                           style="background-color: #F7E1F8; width: 30px; height: 30px;">
+                           <img src="font-icons/arrows.svg" alt="arrows" width="14">
+                        </div>
+                        <span class="text-sm" style="color: #2D233C;"> {{ item }} </span>
+                     </div>
+                  </div>
+               </ng-container>
+            </div>
+         </div>
+      </ng-container>
+   </ng-container>
+
+   <ng-container *ngIf="isRecharge">
+      <div class="mb-2">
+         <input type="text" [(ngModel)]="celular" class="font-semibold text-center titular-payment text-2xl">
+      </div>
+      <div class="text-center">
+         <input type="text" [(ngModel)]="titular" class="text-500 text-center outline-none border-none text-base">
+      </div>
+
+      <ng-container *ngIf="!isChooseOperator">
+         <div>
+            <div class="text-yape mt-5 mb-3 px-4">
+               <div class="text-sm font-bold">Elige la operadora</div>
+            </div>
+            <div class="px-4">
+               <ng-container *ngFor="let item of operadoras">
+                  <div (click)="onPagarOperadora(item.valor1)" class="pointer border-round-md shadow-2 p-3 mb-3">
+                     <div class="font-medium flex align-items-center gap-3">
+                        <div
+                           class="text-center border-circle flex justify-content-center align-items-center border-1 border-gray-200"
+                           style="background-color: #fff; width: 40px; height: 40px;">
+                           <img [src]="item.img" alt="arrows" width="30">
+                        </div>
+                        <span class="text-sm" style="color: #2D233C;"> {{ item.valor1 }} </span>
+                     </div>
+                  </div>
+               </ng-container>
+            </div>
+         </div>
+         <div class="flex-1"></div>
+      </ng-container>
+
+      <ng-container *ngIf="isChooseOperator">
+         <div class="flex-1 align-content-center">
+            <div class="align-content-center text-center">
+               <div class="flex justify-content-center align-items-start mb-3 tourid-13">
+                  <div style="color: #E3B2EC;" class="text-lg font-bold mb-2 mr-1 align-self-end">S/</div>
+                  <div style="color: #742284;" class="text-6xl border-none outline-none" contenteditable="true"
+                     (input)="updateAmount($event)" [textContent]="monto" inputmode="numeric">
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="p-5 mb-3">
+            <div class="flex justify-content-center gap-3 mb-3">
+               <ng-container *ngFor="let item of montos">
+                  <div (click)="onSelectAmount(item.valor)" class="pointer border-round-md shadow-2 px-3 py-2 mb-3">
+                     <div class="font-medium flex align-items-center gap-3">
+                        <span class="text-sm" style="color: #2D233C;">
+                           <span style="color: #9A92A7;">S/</span> {{ item.valor }}
+                        </span>
+                     </div>
+                  </div>
+               </ng-container>
+            </div>
+            <button (click)="onYapear()" pButton size="small" class="w-full py-3 tourid-15" label="RECARGAR"
+               [ngClass]="{ 'p-button-secondary surface-300': disabledButton }"
+               [disabled]="disabledButton || celular.length != 9 ">
+            </button>
+         </div>
+      </ng-container>
+
+   </ng-container>
+</div>
+
+<ng-container *ngIf="showCaptura">
+   <app-voucher [data]="data" (cerrar)="onRetornar()"></app-voucher>
+</ng-container>
+
+<p-dialog [(visible)]="loading" [modal]="true" [style]="{ width: '16rem' }" [maximizable]="true" [showHeader]="false">
+   <div class="pt-3 mb-2 text-center">
+      <div class="mt-3">
+         <i class="text-primary pi pi-spin pi-spinner font-semibold"></i>
+      </div>
+      <div class="mt-2 font-bold">
+         Yapeando
+      </div>
+   </div>
+</p-dialog>
+
+<p-dialog [(visible)]="modalOtrosBancos" [modal]="true" [showHeader]="false" [dismissableMask]="true" position="bottom"
+   styleClass="p-dialog-banks" [focusOnShow]="false">
+   <div class="text-center mt-5">
+      <div class="mb-2 text-center border-circle mx-auto flex justify-content-center align-items-center"
+         style="background-color: #F7E1F8; width: 50px; height: 50px;">
+         <img src="font-icons/arrows.svg" alt="arrows" width="20">
+      </div>
+
+      <!-- TITULAR editable -->
+      <div class="mb-3">
+         <div class="mb-1" style="color: #752481;">Vas a yapear a:</div>
+         <input [(ngModel)]="titular" class="editable-text text-lg font-bold text-center"
+            placeholder="Nombre del titular" style="color: #752481;">
+      </div>
+
+      <!-- Monto y Destino -->
+      <div class="bg-yape-config mb-3 p-3 border-round-sm">
+         <div class="flex justify-content-between mb-2">
+            <span class="text-sm">Monto:</span>
+            <div class="flex">
+               <input type="number" [value]="montoMask" [(ngModel)]="monto"
+                  class="editable-text text-sm font-bold text-right" placeholder="0.00">
+            </div>
+         </div>
+         <div class="flex justify-content-between">
+            <span class="text-sm">Destino:</span>
+            <input [(ngModel)]="destino" class="editable-text text-sm font-bold text-right" placeholder="Destino">
+         </div>
+      </div>
+
+      <div class="mb-3 flex justify-content-center align-items-center gap-2 text-sm">
+         <p-toggleswitch [(ngModel)]="showphone" size="small" /> Mostrar Nro. Celular
+      </div>
+
+      <div class="mb-3">
+         <button (click)="onYapear()" pButton size="small" class="w-full py-3" label="CONFIRMAR YAPEO"></button>
+      </div>
+      <div>
+         <button (click)="modalOtrosBancos = false" pButton size="small" class="p-button-outlined w-full py-3"
+            label="CANCELAR"></button>
+      </div>
+   </div>
+</p-dialog>
+
+<p-dialog [(visible)]="modalChangeDate" [modal]="true" [showHeader]="false" [dismissableMask]="true"
+   [style]="{ width: '16rem' }" [focusOnShow]="false">
+   <ng-container *ngIf="modalChangeDate">
+      <div class="text-center mt-5">
+         <div class="mb-2">
+            <strong>Cambiar fecha:</strong>
+         </div>
+         <div class="mb-3">
+            <p-datepicker [formControl]="newDate" [showTime]="true" [hourFormat]="'12'" appendTo="body"
+               [showOnFocus]="false" class="w-full" />
+         </div>
+         <div class="mb-3">
+            <button (click)="onYapear()" pButton class="w-full py-2" label="YAPEAR" [disabled]="newDate.invalid">
+            </button>
+         </div>
+         <div class="flex align-items-center gap-2 text-sm mb-2">
+            <p-checkbox [formControl]="disabledChangeDate" [binary]="true" inputId="formDate" />
+            <label class="text-sm" for="formDate">Desactivar esta función despues de Yapear</label>
+         </div>
+      </div>
+   </ng-container>
+</p-dialog>

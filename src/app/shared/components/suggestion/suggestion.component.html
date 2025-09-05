@@ -1,0 +1,34 @@
+<div class="align-content-center text-center bg-gray-100 p-3 border-round-lg">
+   <p class="text-xl font-bold mb-4 text-primary">¡USA LA APLICACIÓN <br> COMO SI FUERA UNA APK!</p>
+
+   <div class="mb-4">
+      <div class="mb-2">
+         <strong class="mb-2">¿Ya instalaste la APP?</strong><br>
+      </div>
+      <div class="mb-2 text-sm">
+         Ábrela desde el ícono de tu celular <br> para una mejor experiencia.
+      </div>
+      <img src="auth/pwa_apk.webp" width="150" class="border-round-lg">
+   </div>
+
+   <div class="mb-4">
+      <div class="mb-2">
+         <strong>¿Aún no la instalas?</strong><br>
+      </div>
+      <div class="mb-2">
+         <div class="text-sm">
+            En tu navegador {{ browser}} de {{ sistema }} dale
+         </div>
+         <div class="text-sm" [innerHTML]="description"></div>
+         <div class="text-sm">
+           Finalmente click a <strong>"Instalar"</strong>
+         </div>
+      </div>
+      <img [src]="imgSrc" width="100%" class="border-round-lg" />
+   </div>
+
+   <div class="mb-2">
+      <a [href]="linkSoporte" target="_blank" pButton label="Necesito Ayuda" icon="pi pi-whatsapp"
+         class="p-button-sm"></a>
+   </div>
+</div>

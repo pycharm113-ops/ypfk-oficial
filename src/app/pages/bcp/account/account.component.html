@@ -1,0 +1,122 @@
+<ng-container *ngIf="!showCaptura">
+   <div class="app-container sticky fixed top-0 w-full p-4 text-white flex gap-3 z-5"
+      style="background-color: #002A8E;">
+      <div routerLink="/bcp" class="pointer">
+         <i class="pi pi-arrow-left"></i>
+      </div>
+      <div class="font-semibold" style="font-size: 16px;">Cuentas</div>
+   </div>
+
+   <div class="select-none p-4 mb-5">
+      <section *ngIf="account" class="mb-4">
+         <div class="flex justify-content-between mb-4">
+            <div>
+               <div class="text-lg font-semibold mb-2 truncate-text" style="max-width: 280px;">
+                  {{ account.nombre | uppercase }}
+               </div>
+               <div class="bcp-text-gray">
+                  <span class="mb-1 block">{{ account.nrocuenta }}</span>
+                  <span>CCI: {{ account.cci || account.nrocuenta }}</span>
+               </div>
+            </div>
+            <div class="flex flex-column justify-content-around bcp-success">
+               <i (click)="onEditarCuenta()" class="pointer pi pi-pencil font-semibold p-1"></i>
+               <i (click)="onCompartirCuenta()" class="pointer pi pi-share-alt font-semibold p-1"></i>
+            </div>
+         </div>
+         <div>
+            <div class="mb-2">Disponible</div>
+            <div class="text-4xl bcp-primary">
+               {{ account.saldo | currency: account.moneda: 'symbol-narrow' }}
+            </div>
+         </div>
+      </section>
+
+      <section class="mb-4">
+         <div class="border-top-1 border-bottom-1 border-gray-200 py-3 px-2">
+            <app-operations [operations]="operations" [accountId]="accountId"></app-operations>
+         </div>
+      </section>
+
+      <section class="mb-4 text-white">
+         <div class="border-round p-2" style="background-color: #0A47F0;">
+            <div class="flex justify-content-between">
+               <img src="bcp/finanzas.webp" width="60" height="60">
+               <div class="align-content-center w-full ml-2">
+                  <span class="font-semibold block">Monitorea tus finanzas a...</span>
+                  <span>Organiza y controla tus gastos</span>
+               </div>
+               <div class="align-content-center px-2">
+                  <i class="pi pi-angle-right"></i>
+               </div>
+            </div>
+         </div>
+      </section>
+
+      <section class="flex justify-content-between font-semibold px-2 my-5">
+         <div class="bcp-primary">
+            Movimientos
+         </div>
+         <div class="bcp-success">
+            Ver más
+         </div>
+      </section>
+
+      <section *ngIf="movements.length > 0" class="px-2">
+         <div *ngIf="movements1.length > 0" class="mb-5">
+            <strong class="bcp-text-gray">Hoy</strong>
+            <ng-container *ngFor="let item of movements1">
+               <ng-container *ngTemplateOutlet="accountCard; context: {$implicit: item }"></ng-container>
+            </ng-container>
+         </div>
+         <div *ngIf="movements2.length > 0" class="mb-5">
+            <strong class="bcp-text-gray">Este Mes</strong>
+            <ng-container *ngFor="let item of movements2">
+               <ng-container *ngTemplateOutlet="accountCard; context: {$implicit: item }"></ng-container>
+            </ng-container>
+         </div>
+         <div *ngIf="movements3.length > 0" class="mb-5">
+            <strong class="bcp-text-gray">Hace mucho tiempo</strong>
+            <ng-container *ngFor="let item of movements3">
+               <ng-container *ngTemplateOutlet="accountCard; context: {$implicit: item }"></ng-container>
+            </ng-container>
+         </div>
+      </section>
+
+      <section *ngIf="movements.length === 0" class="px-2 py-3 text-center bcp-text-gray text-xs">
+         No se encontraron registros.
+      </section>
+   </div>
+
+   <div class="app-container fixed bottom-0 bg-white w-full">
+      <app-navigation></app-navigation>
+   </div>
+
+</ng-container>
+
+<ng-container *ngIf="showCaptura">
+   <app-voucher [data]="data" [isFromAccount]="true" (cerrar)="onRetornar()"></app-voucher>
+</ng-container>
+
+<ng-template #accountCard let-item>
+   <div (click)="onVerVoucher(item)" (touchstart)="onTouchStart($event, item)" (touchmove)="onTouchMove($event)"
+      (touchend)="onTouchEnd($event)" [style.transform]="'translateX(' + (currentTranslateX.get(item) || 0) + 'px)'"
+      [@fadeOut]="fadingItems.has(item) ? 'hidden' : 'visible'"
+      class="pointer flex justify-content-between border-bottom-1 border-gray-200 py-3"
+      style="overflow: hidden; touch-action: pan-y; position: relative;">
+      <div class="flex align-items-center gap-2">
+         <div class="bcp-circle-primary font-semibold text-xs" style="width: 32px; height: 32px;">
+            {{ item.nameMask.slice(0, 2) | uppercase }}
+         </div>
+         <div class="flex flex-column gap-2">
+            <span class="truncate-text font-semibold" style="max-width: 150px;">{{ item.nameMask }}</span>
+            <span class="bcp-text-gray">{{ item.fechaMask }}</span>
+         </div>
+      </div>
+      <div class="flex align-items-center gap-2">
+         <span class="font-semibold" [ngClass]="item.selfTransaction ? '': 'text-red-500'">
+            {{ item.montoMask | currency: item.moneda: 'symbol-narrow' }}</span>
+         <i class="pi pi-angle-right bcp-text-gray"></i>
+      </div>
+   </div>
+</ng-template>

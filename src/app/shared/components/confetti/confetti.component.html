@@ -1,0 +1,8 @@
+<ng-container *ngIf="showConfettiGif">
+   <div class="confetti-overlay" [class.fade-out]="fadeOutConfetti">
+      <img src="confetti.gif" alt="confetti" />
+   </div>
+</ng-container>
+
+<canvas #canvas class="confetti-canvas"></canvas>
+

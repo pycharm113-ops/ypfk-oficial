@@ -1,0 +1,83 @@
+<div class="">
+   <div class="ibk-success flex justify-content-center align-items-center gap-5 p-3">
+      <i class="pi pi-bars p-2"></i>
+      <div class="flex-1 text-center">
+         <img src="ibk/logo.png" class="w-8rem">
+      </div>
+      <i class="pi pi-bell p-2"></i>
+   </div>
+
+   <div class="py-3 px-4">
+      <div class="ibk-primary font-semibold text-center mb-3">
+         ¿A quién le vas a Plinear hoy?
+      </div>
+
+      <div class="mb-3">
+         <p-carousel [value]="items" [numVisible]="4" [numScroll]="1" [circular]="false" [showIndicators]="false"
+            [showNavigators]="false">
+            <ng-template pTemplate="item" let-item>
+               <div style="flex: 0 0 60px; margin-right: 12px;">
+                  <div [ngClass]="{'ibk-circle': item.type === 'plin','circle-double': item.type === 'add' }"
+                     style="margin-bottom: 8px;">
+                     <ng-container *ngIf="item.type === 'plin'">
+                        <img [src]="item.icon" alt="plin logo" />
+                     </ng-container>
+                     <ng-container *ngIf="item.type === 'add'">
+                        <i [class]="item.icon" class="font-bold"></i>
+                     </ng-container>
+                  </div>
+                  <div class="text-center text-sm"
+                     [ngClass]="item.type === 'add'? 'ibk-success font-semibold': 'text-ibk-2'">
+                     {{ item.label }}
+                  </div>
+               </div>
+            </ng-template>
+         </p-carousel>
+      </div>
+
+      <div class="text-ibk-1 flex justify-content-center gap-1 text-sm mb-3">
+         <span>T.C. referencial:</span>
+         <span>Compra:</span>
+         <span class="font-semibold">{{tcCompra}}</span>
+         <span>Venta:</span>
+         <span class="font-semibold">{{tcVenta}}</span>
+      </div>
+
+      <div class="py-3 px-4 bg-white shadow-2 border-round-lg">
+         <div class="flex justify-content-between text-ibk-2 mb-3">
+            <div class="align-content-center">
+               Productos
+            </div>
+            <div class="flex gap-2">
+               <div style="background: #F0FBF5;"
+                  class="p-2 border-circle flex justify-content-center align-content-center">
+                  <i class="pi pi-pencil ibk-success"></i>
+               </div>
+               <div style="background: #F0FBF5;"
+                  class="p-2 border-circle flex justify-content-center align-content-center">
+                  <i class="pi pi-eye-slash ibk-success"></i>
+               </div>
+            </div>
+         </div>
+         <div *ngFor="let p of products; let last = last" [ngClass]="{'border-bottom-1 border-gray-200': !last}">
+            <div class="flex align-items-center gap-3 mt-3" [ngClass]="{'mb-3': !last}">
+               <div class="ibk-product">
+                  <img [src]="p.img" width="30">
+               </div>
+               <div class="flex-1">
+                  <div class="mb-1 text-base text-ibk-2 font-semibold">{{p.name}}</div>
+                  <div class="flex justify-content-between">
+                     <div>
+                        <div class="mb-1 text-xl text-ibk-1 w-full">{{p.amount}}</div>
+                        <div class="mb-1 text-gray-400 text-sm">{{p.subtitle}}</div>
+                     </div>
+                     <i class="pi pi-chevron-right text-700 ibk-success font-semibold"></i>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+   </div>
+
+</div>

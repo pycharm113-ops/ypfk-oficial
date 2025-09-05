@@ -1,0 +1,85 @@
+<ng-container *ngIf="isConfig">
+   <div *ngFor="let item of accountsHome" class="select-none">
+      <div [routerLink]="['account']" [queryParams]="{ id: item.id }"
+         class="pointer flex justify-content-between align-items-center py-4 border-bottom-1 border-gray-100">
+         <div class="flex align-items-center gap-3">
+            <img src="bcp/icon-light.svg" alt="" width="25" height="25">
+            <div class="flex flex-column gap-1">
+               <span class="truncate-text font-semibold" style="max-width: 175px;">{{ item.nombre }}</span>
+               <span class="bcp-text-gray">{{ item.mask }}</span>
+            </div>
+         </div>
+         <div class="flex align-items-center gap-1">
+            <div class="font-semibold">
+               {{ showSaldos ? (item.moneda === 'PEN' ? 'S/ *****' : '$ *****') : (item.saldo | currency:item.moneda:'symbol-narrow') }}
+            </div>
+            <i class="pi pi-angle-right bcp-text-gray"></i>
+         </div>
+      </div>
+   </div>
+</ng-container>
+
+<ng-container *ngIf="!isConfig">
+   <div class="select-none flex justify-content-between p-4">
+      <div class="font-semibold p-1">
+         <span>Editar productos pricipales</span>
+      </div>
+      <a (click)="onBack()" class="pointer p-1">
+         <i class="pi pi-times"></i>
+      </a>
+   </div>
+   <section class="select-none px-5">
+      <div class="text-base bcp-primary font-semibold flex justify-content-between mb-3">
+         <span>Mis Cuentas</span>
+         <span (click)="onEditarCuenta(null, null)" class="pointer text-sm bcp-success">Agregar</span>
+      </div>
+      <div class="text-gray-500 text-sm mb-3">
+         Selecciona hasta 3 productos que se mostrarán en tu pantalla de inicio.
+      </div>
+      <div class="max-h-28rem overflow-y-auto px-1 pb-2" style="scrollbar-width: none;">
+         <div *ngFor="let item of accounts; let i = index; let last = last" [ngClass]="{'mb-3': !last}">
+            <div class="shadow-2"
+               [ngClass]="item.order ? 'border-bcp-success' : 'border-2 border-gray-200 border-round'"
+               (click)="toggleAccountSelection(item)">
+               <div class="flex justify-content-between align-items-center relative p-2">
+                  <div class="flex align-items-center pointer w-full">
+                     <img src="bcp/icon-light.svg" alt="" width="25" height="25" class="mr-2" />
+                     <div class="flex-1">
+                        <div class="truncate-text font-semibold mb-1" style="max-width: 175px;">
+                           {{ item.nombre }}
+                        </div>
+                        <div class="flex justify-content-between">
+                           <div class="flex flex-column flex-1 mb-1">
+                              <span class="bcp-text-gray">{{ item.mask }}</span>
+                              <span class="bcp-text-gray text-xs">
+                                 {{ item.saldo | currency:item.moneda:'symbol-narrow' }}
+                              </span>
+                           </div>
+                           <div class="flex align-items-center gap-2 mx-1">
+                              <div (click)="onEliminarCuenta(item); $event.stopPropagation()" class="pointer">
+                                 <i class="pi pi-trash bcp-primary"></i>
+                              </div>
+                              <div (click)="onEditarCuenta(item, i); $event.stopPropagation()" class="pointer">
+                                 <i class="pi pi-pencil bcp-primary"></i>
+                              </div>
+                              <div (click)="toggleAccountSelection(item); $event.stopPropagation()"
+                                 class="pointer circle-success" [style.background]="item.order ? '#ff7800' : '#d7d7d7'">
+                                 {{ item.order }}
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+      </div>
+      <div class="text-center py-4">
+         <button (click)="onGuardar()" [disabled]="!hasChanges" class="bcp-button mb-3" type="button">Guardar</button>
+         <a routerLink="/" class="pointer underline flex justify-content-center gap-3 text-sm">
+            <span>Cerrar Sesión</span>
+         </a>
+      </div>
+   </section>
+</ng-container>

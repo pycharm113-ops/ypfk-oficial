@@ -1,0 +1,49 @@
+<div *ngIf="!showAccounts" class="select-none">
+   <section class="p-4 text-white" style="background-color: #002A8E;">
+      <div class="flex flex-column gap-4">
+         <div class="flex justify-content-between align-items-center">
+            <img src="bcp/logo.svg" alt="" width="90" height="22.66">
+            <div class="flex gap-4">
+               <i class="text-lg pi pi-question-circle"></i>
+               <i class="text-lg pi pi-bell"></i>
+            </div>
+         </div>
+         <div class="text-xl font-semibold">
+            Hola, {{ profile.titular }}
+         </div>
+      </div>
+   </section>
+
+   <div class="p-4">
+      <section class="flex justify-content-between align-items-center mb-2">
+         <div class="bcp-primary font-semibold">Tus productos</div>
+         <div class="flex gap-2">
+            <div (click)="showSaldos = !showSaldos" class="p-2 pointer">
+               <i [class]="showSaldos ? 'pi pi-eye': 'pi pi-eye-slash'"></i>
+            </div>
+            <div (click)="onCrearCuentas()" class="p-2 pointer">
+               <i class="pi pi-pencil"></i>
+            </div>
+         </div>
+      </section>
+
+      <section class="mb-2">
+         <app-config [isConfig]="true" [showSaldos]="showSaldos"></app-config>
+         <div (click)="onCrearCuentas()" class="pointer font-semibold text-center py-3" style="color: #ff7800;">
+            Ver todos
+         </div>
+      </section>
+
+      <section class="mb-2">
+         <app-operations [operations]="operations"></app-operations>
+      </section>
+   </div>
+
+   <div class="app-container fixed bottom-0 bg-white w-full">
+      <app-navigation></app-navigation>
+   </div>
+</div>
+
+<ng-container *ngIf="showAccounts">
+   <app-config [isConfig]="false" [showSaldos]="showSaldos" (cerrar)="showAccounts = false"></app-config>
+</ng-container>

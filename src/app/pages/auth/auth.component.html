@@ -1,0 +1,231 @@
+<div *ngIf="showLogin" class="bg-yape flex flex-column justify-content-between min-h-screen">
+
+   <!-- Sección Ayuda -->
+   <div class="flex justify-content-end text-white pt-5">
+      <div class="flex justify-content-end text-sm px-4">
+         <a (click)="onAyuda()" style="background-color: #8C3D99;"
+            class="pointer font-semibold flex align-items-center gap-2 py-2 px-2 border-round-3xl text-white no-underline">
+            <img src="font-icons/headphones.svg" alt="" width="18" height="18" class="ml-1">
+            <span class="mr-1">Ayuda</span>
+         </a>
+      </div>
+   </div>
+
+   <!-- Sección central (QR) -->
+   <div class="flex-1 align-content-center">
+      <div class="bg-white flex p-2 border-round-lg mx-auto"
+         style="width: 160px; height: 160px; box-shadow: 0 0 15px 5px rgb(200 200 200 / 10%);">
+         <img src="qr.webp" class="w-full">
+      </div>
+   </div>
+
+   <!-- Sección Teclado -->
+   <div class="bg-white border-round-top-2xl pt-3">
+      <div class="text-center" style="align-content: center; height: 60px;">
+         <div *ngIf="pin.length === 0" style="color: #762284; align-content: center;">
+            <span class="text-xl font-bold">Ingresa tu clave</span>
+         </div>
+         <div *ngIf="pin.length > 0" class="flex justify-content-center align-items-center gap-3">
+            <span *ngFor="let i of [0,1,2,3,4,5]; let idx = index" class="text-6xl font-bold"
+               [ngStyle]="{ color: idx < pin.length ? '#544B68' : '#CECAD6', transition: 'color 0.3s ease' }">
+               •
+            </span>
+         </div>
+      </div>
+
+      <!-- Teclado -->
+      <div class="p-3 px-5">
+         <div class="grid">
+            <ng-container *ngFor="let item of teclado">
+               <div class="col-4" style="padding: 0.2rem !important;">
+                  <button class="w-full text-2xl font-semibold border-round-lg border-none pointer"
+                     (click)="onClick(item)" [ngStyle]="getButtonStyles(item?.tipo)"
+                     style="padding: 0.7rem; font-family: 'Roboto';">
+                     <ng-container [ngSwitch]="item?.tipo">
+                        <ng-container *ngSwitchCase="'numero'">
+                           {{ item.valor }}
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'huella'">
+                           <div class="flex justify-content-center align-items-center">
+                              <img src="font-icons/huella.gif" alt="huella" width="30">
+                           </div>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'borrar'">
+                           <div class="flex justify-content-center align-items-center">
+                              <img src="font-icons/close.svg" alt="close" width="30">
+                           </div>
+                        </ng-container>
+                     </ng-container>
+                  </button>
+               </div>
+            </ng-container>
+         </div>
+      </div>
+
+      <!-- Enlace Olvidé Clave -->
+      <a (click)="!!email ? onRecover() : onAyuda()" target="_blank"
+         class="pointer flex justify-content-center gap-2 pb-5 no-underline">
+         <span class="text-primary font-semibold">OLVIDO O CAMBIO DE CLAVE</span>
+      </a>
+   </div>
+
+</div>
+
+<ng-container *ngIf="!showLogin">
+   <app-register (cerrar)="showLogin = true"></app-register>
+</ng-container>
+
+<p-dialog [(visible)]="loading" [modal]="true" [style]="{ width: '16rem' }" [maximizable]="true" [showHeader]="false">
+   <div class="pt-3 mb-2 text-center">
+      <div class="mt-3">
+         <i class="text-primary pi pi-spin pi-spinner font-semibold"></i>
+      </div>
+      <div class="mt-2 font-bold">
+         Validando datos
+      </div>
+   </div>
+</p-dialog>
+
+<p-dialog [(visible)]="loadingFailed" [modal]="true" [maximizable]="true" [showHeader]="false"
+   [style]="{ width: '18rem' }">
+   <div class="pt-5 text-sm">
+      <div class="mb-2">
+         {{ errorMsg  }}
+         <ng-container *ngIf="errorCode === 'SESSION_ACTIVE'">
+            <br><br>
+            <span *ngIf="countdown$">Próximo intento disponible en: <strong>{{ countdown$ | async }}</strong></span>
+         </ng-container>
+      </div>
+      <div class="flex justify-content-end">
+         <div (click)="loadingFailed = false" class="pointer text-primary font-semibold py-1">
+            ENTENDIDO
+         </div>
+      </div>
+   </div>
+</p-dialog>
+
+<p-dialog [(visible)]="showIncompatibleBrowser" [modal]="true" [closable]="false" [dismissableMask]="false"
+   [showHeader]="false" [focusOnShow]="false" [style]="{ width: '19rem' }">
+   <app-incompatible [currentUrl]="currentUrl"></app-incompatible>
+</p-dialog>
+
+<p-dialog [(visible)]="showInstallSuggestion" [modal]="true" [closable]="false" [dismissableMask]="false"
+   [showHeader]="false" [focusOnShow]="false" [style]="{ width: '19rem' }" styleClass="p-dialog-message">
+   <app-suggestion></app-suggestion>
+</p-dialog>
+
+<p-dialog [(visible)]="showPrompt" [modal]="true" [maximizable]="true" [showHeader]="false" [style]="{ width: '18rem' }"
+   [dismissableMask]="false">
+   <app-installer></app-installer>
+</p-dialog>
+
+
+<p-dialog [(visible)]="showAyuda" [modal]="true" [maximizable]="true" [showHeader]="false" [dismissableMask]="false"
+   [style]="{ width: '100%', margin: '0.75rem' }" styleClass="p-dialog-padding-0">
+   <div class="p-3">
+      <div class="absolute top-0 right-0 m-3">
+         <button pButton type="button" class="p-button-rounded p-button-secondary bg-white p-1" (click)="onEntendido()"
+            [disabled]="entendidoTimer > 0" style="width: 35px; height: 35px; z-index: 999 !important;">
+            <div class="flex align-items-center justify-content-center">
+               <ng-container *ngIf="entendidoTimer > 0">
+                  <span class="text-sm">{{ entendidoTimer }}</span>
+               </ng-container>
+               <ng-container *ngIf="entendidoTimer === 0">
+                  <i class="pi pi-times text-sm"></i>
+               </ng-container>
+            </div>
+         </button>
+      </div>
+      <div>
+         <div class="mx-auto" style="max-width: 300px;">
+            <img src="auth/yapito_advertencia.png" class="w-full">
+         </div>
+         <div class="text-xl text-center mb-2 font-bold text-red-600 mb-3">¡ADVERTENCIA!</div>
+
+         <div class="text-sm text-gray-800">
+
+            <div class="mb-3 font-bold">
+               Los únicos autorizados para la venta de esta App estan en Telegram y son:
+               <ul class="list-none p-0 pl-1 my-1 my-1 line-height-3">
+                  <li>➤ @dev_lguss</li>
+                  <li>➤ @chucky_net_x_oficial</li>
+                  <li>➤ @gust_100cia1</li>
+               </ul>
+            </div>
+
+            <div class="mb-3">
+               <strong>Reglas</strong>
+               <ul class="p-0 pl-3 my-1 text-sm" style="font-size: 0.85rem !important;">
+                  <li class="mb-1">
+                     El registro es <strong>GRATIS</strong>. Necesitas un correo válido para
+                     recibir tu código de verificación.
+                  </li>
+                  <li class="mb-1">
+                     Para <strong>quitar la marca de agua</strong>, realiza el pago directamente dentro de la
+                     aplicación. La activación es automática y demora 1 minuto.
+                  </li>
+                  <li class="mb-1">
+                     Está prohibida la <strong>reventa no autorizada</strong> de cuentas. Para
+                     evitar estafas compra directamente a un vendedor autorizado.
+                  </li>
+                  <li class="mb-1">
+                     La cuenta es <strong>personal e intransferible</strong>. Si se detecta que está siendo compartida
+                     se puede aplicar un baneo temporal del servicio.
+                  </li>
+               </ul>
+
+            </div>
+
+            <p class="font-semibold text-center uppercase text-cyan-500">
+               <a href="https://t.me/dev_lguss" target="_blank">Cualquier duda a - t.me/dev_lguss</a>
+            </p>
+
+            <div *ngIf="false" class="mb-4">
+               <div class="mb-2">
+                  ✔️ <a (click)="onVerTutorial('demo')" class="text-yape underline">Ver Demo</a>
+               </div>
+               <div class="mb-2">
+                  ✔️ <a (click)="onVerTutorial('installer')" class="text-yape underline">Ver Instalación</a>
+               </div>
+            </div>
+
+            <div class="mb-2">
+               <app-resellers></app-resellers>
+            </div>
+
+         </div>
+      </div>
+   </div>
+</p-dialog>
+
+
+<p-dialog [(visible)]="showRecover" [modal]="true" [maximizable]="true" [showHeader]="false" [dismissableMask]="true"
+   [style]="{ width: '20rem' }">
+
+   <div class="pt-3 px-3">
+      <h3 class="text-center mb-2">Recuperar contraseña</h3>
+      <p class="text-center text-sm text-gray-500 mb-5">
+         Ingresa tu correo electrónico y te enviaremos tu PIN actual.
+      </p>
+      <div class="form-group">
+         <input type="email" class="form-input" placeholder=" " id="email" [formControl]="recover">
+         <label class="form-label" for="email">Correo electrónico</label>
+         <small *ngIf="hasError('required')" class="text-red-400">
+            El correo es obligatorio.
+         </small>
+         <small *ngIf="hasError('pattern')" class="text-red-400">
+            Solo se permiten correos gmail, outlook o hotmail.
+         </small>
+      </div>
+
+      <button (click)="onSendRecover()" [loading]="loadButton" pButton type="button" class="w-full mb-3"
+         label="Enviar Código">
+      </button>
+      <div (click)="onRegister()" class="text-center text-primary font-semibold text-sm">
+         <span class="pointer py-3">
+            QUIERO REGISTRARME
+         </span>
+      </div>
+   </div>
+
+</p-dialog>

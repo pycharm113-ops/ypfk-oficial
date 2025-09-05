@@ -1,0 +1,7 @@
+<div class="select-none flex justify-content-between px-3 py-2 border-top-1 border-gray-100">
+   <div *ngFor="let item of menu" [routerLink]="item.link" class="flex flex-column align-items-center gap-2 pointer p-1"
+      style="width: 75px;">
+      <img [src]="item.icon" width="25">
+      <span [ngClass]="item.color + ' text-uxs'">{{ item.label }}</span>
+   </div>
+</div>

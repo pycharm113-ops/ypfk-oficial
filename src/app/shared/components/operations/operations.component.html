@@ -1,0 +1,18 @@
+<div class="flex justify-content-around">
+   <ng-container *ngFor="let item of operations">
+      <a (click)="onRedirect(item)" class="flex flex-column align-items-center pointer p-2" style="width: 90px;">
+         <div class="bcp-circle-success">
+            <ng-container *ngIf="item.img">
+               <img [src]="item.img" alt="" width="25" style="filter: brightness(0) invert(1);">
+            </ng-container>
+            <ng-container *ngIf="!item.img">
+               <i [class]="item.icon"></i>
+            </ng-container>
+         </div>
+         <div class="mt-2 text-center text-sm" style="color: #606c7f;">
+            {{ item.label }}
+         </div>
+      </a>
+   </ng-container>
+</div>
+<input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" hidden />

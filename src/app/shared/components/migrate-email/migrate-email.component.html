@@ -1,0 +1,95 @@
+<section class="text-center">
+   <!-- Paso 1: Verificación de correo -->
+   <ng-container *ngIf="verifyEmail">
+      <p class="text-sm mt-0 mb-4 text-gray-600">
+         Ingresa tu nombre y un correo válido donde te enviaremos un código de verificación.
+      </p>
+
+      <form [formGroup]="Form" class="mb-4" autocomplete="off" style="text-align: left !important;">
+         <div class="form-group mb-5">
+            <input type="text" class="form-input" placeholder=" " id="titular" formControlName="titular">
+            <label class="form-label" for="titular">Titular</label>
+            <small *ngIf="hasError('titular', 'required')" class="text-red-400">
+               Este campo es obligatorio.
+            </small>
+         </div>
+         <div class="form-group mb-2">
+            <input type="email" class="form-input" placeholder=" " id="email" formControlName="email">
+            <label class="form-label" for="email">Correo electrónico</label>
+            <small *ngIf="hasError('email', 'required')" class="text-red-400">
+               Este campo es obligatorio.
+            </small>
+            <small *ngIf="hasError('email', 'pattern')" class="text-red-400">
+               Solo se permiten gmail, outlook o hotmail.
+            </small>
+         </div>
+      </form>
+
+      <button (click)="verificarEmail()" [loading]="loading" pButton label="Enviar código de verificación" size="small"
+         class="w-full mb-2">
+      </button>
+
+   </ng-container>
+
+   <!-- Paso 2: Ingreso del código -->
+   <ng-container *ngIf="verifyCode">
+      <div *ngIf="loadVerify">
+         <p-progressSpinner></p-progressSpinner>
+      </div>
+
+      <div *ngIf="!loadVerify" class="pb-4">
+         <h3 class="text-lg font-semibold m-0">Revisa tu bandeja de entrada</h3>
+         <p class="text-gray-600 mb-4">Ingresa el código de 6 dígitos que te enviamos al correo
+            <strong>{{ email }}</strong>
+         </p>
+         <ng-container *ngIf="!resetCodeInput">
+            <code-input [isCodeHidden]="false" [codeLength]="6" (codeCompleted)="onCodeCompleted($event)"></code-input>
+         </ng-container>
+         <small *ngIf="codeError" class="block mt-2 text-red-500 font-semibold">
+            ❌ El código ingresado no es válido. Intenta nuevamente.
+         </small>
+
+      </div>
+   </ng-container>
+
+   <!-- Paso 3: Correo validado -->
+   <ng-container *ngIf="codeValidated">
+      <div class="py-0">
+         <h2 class="text-green-600 text-lg font-bold mt-0 mb-2">¡Correo verificado correctamente!</h2>
+         <p class="text-gray-600">Ahora debes crear un PIN de 6 dígitos para asegurar tu cuenta.</p>
+      </div>
+   </ng-container>
+
+   <!-- Paso 4: Crear PIN -->
+   <ng-container *ngIf="pinSetup">
+      <h3 class="m-0 font-semibold text-lg">🔑 Crea tu PIN de acceso</h3>
+      <p class="text-gray-600 mb-4">Este PIN será tu nueva clave para acceder. Memorízalo bien.</p>
+
+      <!-- Paso 1: PIN -->
+      <div class="mb-4" *ngIf="pasoPin === 'primero'">
+         <code-input [isCodeHidden]="true" [codeLength]="6" (codeCompleted)="onPinEntered($event)"></code-input>
+         <small class="block mt-2 text-green-500">Ingresa un PIN de 6 dígitos</small>
+      </div>
+
+      <!-- Paso 2: Repetir PIN -->
+      <div class="mb-4" *ngIf="pasoPin === 'repite'">
+         <code-input [isCodeHidden]="true" [codeLength]="6" (codeCompleted)="onRepeatPinEntered($event)"></code-input>
+         <small class="block mt-2" [ngClass]="pinError ? 'text-red-500' : 'text-green-500'">
+            {{ pinError ? 'Los PIN ingresados no coinciden.' : 'Confirma tu PIN nuevamente' }}
+         </small>
+      </div>
+   </ng-container>
+
+
+   <!-- Paso 5: Simulación de vinculación -->
+   <ng-container *ngIf="finalizando">
+      <p-progressSpinner></p-progressSpinner>
+   </ng-container>
+
+   <!-- Paso 6: Finalizado -->
+   <ng-container *ngIf="finalizado">
+      <h2 class="text-green-500 text-xl font-bold mt-0 mb-3">¡Tu cuenta ha sido vinculada con éxito!</h2>
+      <p class="text-gray-600 mb-4">Ya puedes acceder de forma segura usando tu correo y PIN.</p>
+      <button (click)="cerrarProceso()" pButton label="Iniciar Sesión" class="mb-2"></button>
+   </ng-container>
+</section>

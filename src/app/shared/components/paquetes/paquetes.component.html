@@ -1,0 +1,63 @@
+<div class="grid justify-content-center p-3 mt-2">
+   <ng-container *ngFor="let item of productos">
+      <div class="col-12 md:col-4 mb-3">
+         <div class="p-4 border-round shadow-2 surface-card h-full flex flex-column justify-between">
+            <div>
+               <h2 class="text-xl font-bold my-2 pr-2">{{ item.name }}</h2>
+               <p class="text-sm mb-3">{{ item.description }}</p>
+               <div class="font-semibold text-sm mb-2">Detalles</div>
+               <ul class="list-disc pl-4 text-sm text-color-secondary">
+                  <li *ngFor="let detalle of item.details">{{ detalle }}</li>
+               </ul>
+            </div>
+            <div class="mb-2">
+               <div class="flex align-items-center mb-2">
+                  <span class="text-4xl font-bold text-yape">S/{{ item.price }}</span>
+                  <span *ngIf="item.price != item.previous" class="text-sm line-through text-gray-400 ml-2">
+                     S/{{ item.previous }}
+                  </span>
+               </div>
+               <div class="flex justify-content-between gap-2">
+                  <button (click)="onGenerarOrden(item.code)" pButton label="Comprar" class="p-button-sm px-3"></button>
+                  <div class="flex gap-2">
+                     <button (click)="onIngresarIBK()" pButton label="Ingresar" icon="pi pi-check-circle"
+                        class="p-button-sm p-button-success" *ngIf="item.code === 'YAPEIBK' || item.code === 'IBK'">
+                     </button>
+                     <button (click)="onIngresarBCP()" pButton label="Ingresar" icon="pi pi-check-circle"
+                        class="p-button-sm p-button-warn" *ngIf="item.code === 'YAPEBCP'||  item.code === 'BCP'">
+                     </button>
+                     <ng-container *ngIf="item.code === 'YAPEBCPIBK' || item.code === 'BCPIBK'">
+                        <button (click)="onIngresarIBK()" pButton class="p-button-sm p-button-success"
+                           *ngIf="item.code.includes('IBK')">
+                           <img src="ibk/icon-light.svg" style="width: 15px;">
+                        </button>
+                        <button (click)="onIngresarBCP()" pButton class="p-button-sm bcp-button-primary"
+                           *ngIf="item.code.includes('BCP')">
+                           <img src="bcp/icon-dark.svg" style="width: 15px;">
+                        </button>
+                     </ng-container>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </ng-container>
+   <div *ngIf="!loadingPago" class="col-12 text-center text-yape font-semibold text-sm px-2">
+      La activación es automática y demora <br> 1 minuto despues de realizar el pago. <br><br>
+      Si ya pagaste dale click nuevamente en "Comprar" para validar la activación.
+      <img src="yapeok.gif" alt="gif" width="180" class="mt-3 block mx-auto">
+   </div>
+</div>
+
+<button class="floating-button" (click)="onVerTutorial('payment')">
+   <span class="pulse-ring"></span>
+   <i class="pi pi-question-circle"></i>
+</button>
+
+<p-dialog [(visible)]="loadingPago" [modal]="true" [closable]="false" [showHeader]="false" [style]="{ width: '20rem' }">
+   <div class="text-center pt-5 mt-3">
+      <p-progressSpinner styleClass="mb-3" strokeWidth="5"></p-progressSpinner>
+      <h3>¡Pago validado correctamente!</h3>
+      <p>Espera un momento,<br> estamos redireccionándote…</p>
+   </div>
+</p-dialog>

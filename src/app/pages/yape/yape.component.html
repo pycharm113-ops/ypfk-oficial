@@ -1,0 +1,39 @@
+<div class="app-scroll">
+   <router-outlet></router-outlet>
+</div>
+
+<ngx-guided-tour skipText="Omitir" nextText="Siguiente" doneText="Hecho"></ngx-guided-tour>
+
+<p-dialog [(visible)]="showModal" [modal]="true" [style]="{ width: '12rem' }" [maximizable]="true" [showHeader]="false">
+   <div class="pt-3 mb-2 text-center">
+      <div class="my-3">
+         Cuenta Inactiva
+      </div>
+      <div (click)="onLogout()" class="pointer text-center text-primary font-semibold text-sm">
+         CERRAR SESIÓN
+      </div>
+   </div>
+</p-dialog>
+
+
+<p-dialog [(visible)]="showPrompt" [modal]="true" [maximizable]="false" [showHeader]="false"
+   [style]="{ width: '19rem' }" [dismissableMask]="false">
+   <div (click)="showPrompt = false" class="absolute top-0 right-0 p-2 my-2 mx-3 cursor-pointer">
+      <i class="pi pi-times text-gray-600 text-lg"></i>
+   </div>
+   <div class="mt-5 px-3 text-center">
+      <p class="text-lg text-red-500 font-semibold mb-2">⚠ AVISO</p>
+      <p class="text-sm text-gray-800">
+         Pronto se desactivará el ingreso con <b>PIN</b> único, por lo cual deberas vincular tu <b>correo</b> para
+         poder acceder.
+      </p>
+      <p class="text-sm text-gray-800 mt-2">
+         Esto es para evitar ataques de hackers y mejorar la seguridad.
+      </p>
+      <p class="text-sm text-gray-700 mt-2">
+         Debes migrar tu cuenta vinculando un correo. De lo contrario, podrías perder el acceso.
+      </p>
+      <button (click)="onVincularEmail()" pButton label="Vincular Correo" icon="pi pi-envelope" class="w-full mt-2">
+      </button>
+   </div>
+</p-dialog>

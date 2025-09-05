@@ -1,0 +1,16 @@
+<div *ngIf="!loading" class="bcp app-scroll min-h-screen flex flex-column bcp-secondary" style="font-size: 14px;">
+   <div class="flex-1" style="font-family: 'Flexo', sans-serif; !important">
+      <router-outlet></router-outlet>
+      <ng-container *ngIf="!token.bcp">
+         <div class="watermark">
+            <ng-container *ngFor="let n of [].constructor(5)">
+               <div class="watermark-text" style="transform: unset">DEMOSTRACIÓN GRATUITA</div>
+            </ng-container>
+         </div>
+      </ng-container>
+   </div>
+</div>
+
+<div *ngIf="loading">
+   <app-loading></app-loading>
+</div>

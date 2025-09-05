@@ -1,0 +1,25 @@
+<section>
+   <form [formGroup]="Form" autocomplete="off">
+      <div class="mb-3">
+         <input formControlName="nombre" type="text" placeholder="Titular" class="input-bcp" />
+         <small *ngIf="onValidateForm('nombre')" class="text-red-500">{{ message['nombre'] }}</small>
+      </div>
+      <div class="mb-3 flex gap-2">
+         <select formControlName="moneda" class="input-bcp select-bcp w-6rem">
+            <option value="PEN">Soles</option>
+            <option value="USD">Dolares</option>
+         </select>
+         <input formControlName="saldo" type="number" placeholder="Saldo" class="input-bcp" />
+      </div>
+      <div class="mb-3">
+         <input formControlName="nrocuenta" type="text" placeholder="NroCuenta" class="input-bcp" />
+         <small *ngIf="onValidateForm('nrocuenta')" class="text-red-500">{{ message['nrocuenta'] }}</small>
+      </div>
+      <div class="mb-3">
+         <input formControlName="cci" type="text" placeholder="CCI" class="input-bcp" />
+      </div>
+      <div>
+         <button (click)="onGuardar()" class="bcp-button" type="button">Guardar</button>
+      </div>
+   </form>
+</section>

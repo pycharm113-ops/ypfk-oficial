@@ -1,0 +1,145 @@
+<ng-container *ngIf="!showCaptura && !loading">
+   <div class="select-none flex justify-content-between p-4">
+      <div class="font-semibold p-1">
+         <a (click)="goBack()">
+            <i class="pi pi-arrow-left text-xs font-semibold mr-2"></i>
+         </a>
+         <span *ngIf="esTransferencia">Transferir a tercero BCP</span>
+         <span *ngIf="esServicio">Pagar Servicios</span>
+         <span *ngIf="esYape">Yapear</span>
+      </div>
+      <a (click)="goHome()" class="pointer p-1">
+         <i class="pi pi-times"></i>
+      </a>
+   </div>
+
+   <div class="px-4">
+      <section class="text-center border-bottom-1 border-gray-100">
+         <div class="select-none bcp-circle-primary font-semibold mx-auto my-3">
+            {{ firstLetter }}
+         </div>
+         <textarea [ngModel]="titular" (ngModelChange)="titular = $event" class="titular-bcp-payment mb-1" rows="1"
+            (input)="autoGrow($event)">
+         </textarea>
+         <ng-container *ngIf="esServicio">
+            <div class="mb-2 bcp-text-gray">
+               <input type="text" [(ngModel)]="empresa" class="number-bcp-payment ml-2">
+               <i (click)="onAgregarGlosa()" class="pointer pi pi-plus-circle text-xs"></i>
+            </div>
+            <div class="mb-3 bcp-text-gray">
+               <div *ngIf="glosasVisibles[0]" class="flex justify-content-center align-items-center gap-2">
+                  <input type="text" [(ngModel)]="glosa1" class="number-bcp-payment  ml-3">
+                  <i class="pi pi-times text-xs pointer" (click)="onEliminarGlosa(0)"></i>
+               </div>
+               <div *ngIf="glosasVisibles[1]" class="flex justify-content-center align-items-center gap-2 mt-2">
+                  <input type="text" [(ngModel)]="glosa2" class="number-bcp-payment  ml-3">
+                  <i class="pi pi-times text-xs pointer" (click)="onEliminarGlosa(1)"></i>
+               </div>
+            </div>
+         </ng-container>
+         <ng-container *ngIf="esTransferencia">
+            <div class="mb-3 bcp-text-gray">
+               **** <input type="text" [ngModel]="nrocuenta" (ngModelChange)="nrocuenta = $event?.toString()"
+                  pKeyFilter="pint" maxlength="4" class="number-bcp-payment" style="width: 2.15rem;"> -
+               <ng-container>Moneda {{ esDolar ? 'Dolares' : 'Soles'}}</ng-container>
+            </div>
+         </ng-container>
+         <ng-container *ngIf="esYape">
+            <div class="mb-3 bcp-text-gray">
+               <input [ngModel]="nrocuenta" (ngModelChange)="nrocuenta = $event?.toString()"
+                  (keydown.enter)="onEnterPressed()" pKeyFilter="pint" maxlength="9" class="number-bcp-payment mb-2">
+               <br>
+               <input type="text" [(ngModel)]="destino" class="number-bcp-payment">
+            </div>
+         </ng-container>
+      </section>
+
+      <section class="py-5">
+         <div class="bcp-primary">
+            <div class="select-none font-semibold">Moneda y monto</div>
+
+            <div class="my-3">
+               <div (click)="onChangeMoneda()">
+                  <ng-container *ngTemplateOutlet="svgMoney;"></ng-container>
+               </div>
+            </div>
+
+            <div class="text-4xl bcp-primary mb-5 flex gap-2">
+               <span> {{ esDolar ? '$' : 'S/' }} </span>
+               <p-inputnumber [formControl]="amount" [maxFractionDigits]="2" styleClass="p-inputnumber-bcp">
+               </p-inputnumber>
+            </div>
+
+            <div class="select-none font-semibold py-3">Desde</div>
+            <div (click)="onChangeAccount()">
+               <ng-container *ngTemplateOutlet="accountCard; context: {$implicit: account, width: 200}"></ng-container>
+            </div>
+         </div>
+
+         <div class="text-center py-5">
+            <button (click)="onPayment()" class="bcp-button" type="button" [disabled]="amount?.value == 0">
+               {{ label }}
+            </button>
+         </div>
+      </section>
+   </div>
+
+   <div class="app-container fixed bottom-0 bg-white w-full">
+      <app-navigation></app-navigation>
+   </div>
+</ng-container>
+
+<ng-container *ngIf="!showCaptura && loading">
+   <app-loading [loading]="true"></app-loading>
+</ng-container>
+
+<ng-container *ngIf="showCaptura">
+   <app-voucher [data]="data" (cerrar)="onRetornar()"></app-voucher>
+</ng-container>
+
+<p-dialog [(visible)]="modalAccount" [modal]="true" [style]="{ width: '18rem' }" [showHeader]="false"
+   [dismissableMask]="true">
+   <section class="pt-5">
+      <div class="text-center font-bold mb-3">Seleccionar Cuenta</div>
+      <div class="max-h-17rem overflow-y-auto px-1" style="scrollbar-width: none;">
+         <div (click)="onSelectAccount(item)" *ngFor="let item of accounts" class="bcp-card-box mb-3">
+            <ng-container *ngTemplateOutlet="accountCard; context: {$implicit: item, width: 120 }"></ng-container>
+         </div>
+      </div>
+      <div *ngIf="esTransferencia" class="text-center py-2">
+         <div class="font-bold mb-1">Comisión</div>
+         <input type="number" [(ngModel)]="comision" class="number-bcp-payment" [attr.tabindex]="-1">
+      </div>
+
+      <div class="text-center py-2">
+         <div class="font-bold mb-1">Recibir un pago</div>
+         <p-toggleswitch [(ngModel)]="selfTransaction" />
+      </div>
+   </section>
+</p-dialog>
+
+<ng-template #accountCard let-item let-width="width">
+   <div class="bcp-card select-none flex justify-content-between align-items-center relative"
+      [ngClass]="{ 'bcp-item': accountId === item.id }">
+      <div>
+         <div class="bcp-secondary truncate-text font-semibold mb-2">{{ item.nombre }}</div>
+         <div class="bcp-text-gray">{{ '**** ' + item.nrocuenta.slice(-4) }}</div>
+      </div>
+      <div *ngIf="accountId === item.id" class="floating-circle"></div>
+      <div class="bcp-secondary font-semibold text-right">
+         {{ item.saldo | currency: item.moneda: 'symbol-narrow' }}
+      </div>
+   </div>
+</ng-template>
+
+<ng-template #svgMoney>
+   <svg width="90" height="30" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0.5" y="0.5" rx="20" ry="20" width="119" height="39" fill="#ffffff" stroke="#dcdcdc" stroke-width="1" />
+      <rect [attr.x]="esDolar ? 60 : 0.5" y="0.5" rx="20" ry="20" [attr.width]="esDolar ? 59.5 : 60" height="39"
+         fill="#d1d3d4" />
+      <text x="30" y="21" text-anchor="middle" dominant-baseline="middle" font-family="Roboto" font-size="20"
+         [attr.font-weight]="!esDolar ? 'bold' : null" [attr.fill]="!esDolar ? '#ffffff' : '#cccccc'">S/</text>
+      <text x="90" y="21" text-anchor="middle" dominant-baseline="middle" font-family="Roboto" font-size="20"
+         [attr.font-weight]="esDolar ? 'bold' : null" [attr.fill]="esDolar ? '#ffffff' : '#cccccc'">$</text>
+   </svg>
+</ng-template>
