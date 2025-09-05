@@ -16,7 +16,7 @@ export class PaymentService {
   }
 
   crearPago(product: string) {
-    const url = `${base_url}/payments/create-payment`;
+    const url = `${base_url}/payments/createPayment`;
     return this.http.post<any>(url, { product }, { headers: this.headers });
   }
 

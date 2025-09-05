@@ -236,9 +236,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
           return;
         }
 
-        const obs = this.token.client ? this.generalService.logoutClient() : this.generalService.logoutUser();
-
-        obs.subscribe({
+        this.generalService.logout().subscribe({
           next: (resp) => {
             if (resp.status) {
               this.cooldownService.onLogout();

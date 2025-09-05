@@ -162,29 +162,14 @@ export class GeneralService {
     return this.http.post<any>(url, data, { headers: this.headers });
   }
 
-  onLoginClient(data: any): Observable<ILogin> {
-    const url = `${base_url}/auth/access`;
+  login(data: any): Observable<ILogin> {
+    const url = `${base_url}/auth/login`;
     return this.http.post<ILogin>(url, data);
   }
 
-  logoutClient(): Observable<any> {
-    const url = `${base_url}/auth/logoutClient`;
+  logout(): Observable<any> {
+    const url = `${base_url}/auth/logout`;
     return this.http.post<any>(url, null, { headers: this.headers });
-  }
-
-  logoutUser(): Observable<any> {
-    const url = `${base_url}/auth/logoutUser`;
-    return this.http.post<any>(url, null, { headers: this.headers });
-  }
-
-  onLogin(pin: string): Observable<ILogin> {
-    const url = `${base_url}/auth/login`;
-    return this.http.post<ILogin>(url, { pin });
-  }
-
-  onValidarSesion(): Observable<IValidateToken> {
-    const url = `${base_url}/auth/refresh`;
-    return this.http.get<IValidateToken>(url, { headers: this.headers });
   }
 
   onActualizarPIN(pin: string): Observable<ILogin> {
