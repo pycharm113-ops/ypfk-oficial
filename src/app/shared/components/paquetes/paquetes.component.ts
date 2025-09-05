@@ -56,13 +56,15 @@ export class PaquetesComponent implements OnInit {
       if (resp === 'PAID') {
         this.loadingPago = true;
         const pin = this.token.pin;
-        const obs = this.email ? this.generalService.onLoginClient({ pin, email: this.email, reload: true }) : this.generalService.onLogin(pin);
-        obs.pipe(delay(2000)).subscribe((resp) => {
-          this.loadingPago = false;
-          localStorage.setItem('token', resp.token);
-          this.router.navigateByUrl('/');
-          this.generalService.onRefreshToken.next(true);
-        });
+        this.generalService
+          .login({ pin, email: this.email, reload: true })
+          .pipe(delay(2000))
+          .subscribe((resp) => {
+            this.loadingPago = false;
+            localStorage.setItem('token', resp.token);
+            this.router.navigateByUrl('/');
+            this.generalService.onRefreshToken.next(true);
+          });
       }
     });
   }

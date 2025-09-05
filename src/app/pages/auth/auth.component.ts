@@ -170,9 +170,7 @@ export class AuthComponent implements OnInit {
   onLogin(pin: string) {
     this.loading = true;
 
-    const obs = this.email ? this.generalService.onLoginClient({ pin, email: this.email }) : this.generalService.onLogin(pin);
-
-    obs.subscribe({
+    this.generalService.login({ pin, email: this.email }).subscribe({
       next: (resp) => {
         this.loading = false;
         if (resp.status) {
